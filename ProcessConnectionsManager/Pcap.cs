@@ -93,6 +93,10 @@ namespace ProcessConnectionsManager
             {
                 Receiver.Wait();
             }
+            catch (AggregateException)
+            {
+
+            }
             finally
             {
                 CTSource.Dispose();
