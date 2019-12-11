@@ -69,7 +69,7 @@ namespace ProcessConnectionsManager
                                 // Timeout elapsed
                                 continue;
                             case PacketCommunicatorReceiveResult.Ok:
-                                new Task(() => AddForeignIP(currentIPText, packet)).Start();
+                                Task.Run(() => AddForeignIP(currentIPText, packet));
                                 break;
                             default:
                                 throw new InvalidOperationException("The result " + result + " should never be reached here");
@@ -87,15 +87,10 @@ namespace ProcessConnectionsManager
                 return;
             }
 
-            CTSource.Cancel();
-
             try
             {
+                CTSource.Cancel();
                 Receiver.Wait();
-            }
-            catch (AggregateException)
-            {
-
             }
             finally
             {

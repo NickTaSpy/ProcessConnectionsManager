@@ -86,7 +86,7 @@
             this.PortList.Location = new System.Drawing.Point(6, 147);
             this.PortList.MultiSelect = false;
             this.PortList.Name = "PortList";
-            this.PortList.Size = new System.Drawing.Size(264, 300);
+            this.PortList.Size = new System.Drawing.Size(264, 273);
             this.PortList.TabIndex = 2;
             this.PortList.UseCompatibleStateImageBehavior = false;
             this.PortList.View = System.Windows.Forms.View.Details;
@@ -200,7 +200,7 @@
             this.groupBox1.Controls.Add(this.ProcessNameRadio);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(275, 453);
+            this.groupBox1.Size = new System.Drawing.Size(275, 426);
             this.groupBox1.TabIndex = 17;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Find ports";
@@ -223,7 +223,7 @@
             this.groupBox2.Controls.Add(this.FwCheckButton);
             this.groupBox2.Location = new System.Drawing.Point(467, 12);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(287, 453);
+            this.groupBox2.Size = new System.Drawing.Size(287, 426);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Windows Firewall";
@@ -316,7 +316,7 @@
             this.groupBox3.Controls.Add(this.UDPListenButton);
             this.groupBox3.Location = new System.Drawing.Point(293, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(168, 453);
+            this.groupBox3.Size = new System.Drawing.Size(168, 426);
             this.groupBox3.TabIndex = 21;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "UDP Listener";
@@ -333,7 +333,7 @@
             this.ForeignIPList.Location = new System.Drawing.Point(6, 59);
             this.ForeignIPList.MultiSelect = false;
             this.ForeignIPList.Name = "ForeignIPList";
-            this.ForeignIPList.Size = new System.Drawing.Size(156, 388);
+            this.ForeignIPList.Size = new System.Drawing.Size(156, 361);
             this.ForeignIPList.TabIndex = 22;
             this.ForeignIPList.UseCompatibleStateImageBehavior = false;
             this.ForeignIPList.View = System.Windows.Forms.View.Details;
@@ -354,7 +354,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(764, 477);
+            this.ClientSize = new System.Drawing.Size(764, 450);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
