@@ -1,6 +1,9 @@
 # ProcessConnectionsManager
 Windows Form Application - Allows you to block remote IP addresses that communicate with a process
 
+# Requirements
+You need to install [WinPcap](https://www.winpcap.org/) in order to use the UDP listener.
+
 # Bugs
 Bugs may be found, the application works generally speaking but I haven't tried it in real scenarios yet.
 
