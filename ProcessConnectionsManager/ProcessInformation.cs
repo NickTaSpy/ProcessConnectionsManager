@@ -32,9 +32,9 @@ namespace ProcessConnectionsManager
         {
             var ports = new List<Port>();
 
-            using (Process p = new Process())
+            using var p = new Process
             {
-                ProcessStartInfo ps = new ProcessStartInfo
+                StartInfo = new ProcessStartInfo
                 {
                     Arguments = "-a -n -o",
                     FileName = "netstat.exe",
@@ -43,59 +43,56 @@ namespace ProcessConnectionsManager
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
-                };
-
-                p.StartInfo = ps;
-                p.Start();
-
-                StreamReader stdOutput = p.StandardOutput;
-                StreamReader stdError = p.StandardError;
-
-                string content = stdOutput.ReadToEnd() + stdError.ReadToEnd();
-                string exitStatus = p.ExitCode.ToString();
-
-                if (exitStatus != "0")
-                {
-                    // Command Errored. Handle here if need be.
-                    process = null;
-                    return ports;
                 }
+            };
+            p.Start();
 
-                // Get the rows.
-                string[] rows = Regex.Split(content, "\r\n");
-                foreach (string row in rows)
-                {
-                    string[] tokens = Regex.Split(row, "\\s+");
-                    if (tokens.Length > 4 && (tokens[1] == "UDP" || tokens[1] == "TCP"))
-                    {
-                        int id = tokens[1] == "UDP" ? int.Parse(tokens[4]) : int.Parse(tokens[5]);
-                        if (id != pid)
-                        {
-                            continue;
-                        }
+            StreamReader stdOutput = p.StandardOutput;
+            StreamReader stdError = p.StandardError;
 
-                        string port = Regex.Replace(tokens[2], @"\[(.*?)\]", "1.1.1.1").Split(':')[1];
-                        string foreignAddress = tokens[1] == "UDP" ? "" : Regex.Replace(tokens[3], @"\[(.*?)\]", "1.1.1.1").Split(':')[0];
-                        ports.Add(new Port
-                        {
-                            Protocol = tokens[1],
-                            PortNumber = port,
-                            ForeignIP = foreignAddress
-                        });
-                    }
-                }
+            string content = stdOutput.ReadToEnd() + stdError.ReadToEnd();
+            string exitStatus = p.ExitCode.ToString();
 
-                try
-                {
-                    process = Process.GetProcessById(pid);
-                }
-                catch (ArgumentException)
-                {
-                    process = null;
-                }
-                
+            if (exitStatus != "0")
+            {
+                // Command Errored. Handle here if need be.
+                process = null;
                 return ports;
             }
+
+            // Get the rows.
+            foreach (string row in Regex.Split(content, "\r\n"))
+            {
+                string[] tokens = Regex.Split(row, "\\s+");
+                if (tokens.Length > 4 && (tokens[1] == "UDP" || tokens[1] == "TCP"))
+                {
+                    int id = tokens[1] == "UDP" ? int.Parse(tokens[4]) : int.Parse(tokens[5]);
+                    if (id != pid)
+                    {
+                        continue;
+                    }
+
+                    string port = Regex.Replace(tokens[2], @"\[(.*?)\]", "1.1.1.1").Split(':')[1];
+                    string foreignAddress = tokens[1] == "UDP" ? "" : Regex.Replace(tokens[3], @"\[(.*?)\]", "1.1.1.1").Split(':')[0];
+                    ports.Add(new Port
+                    {
+                        Protocol = tokens[1],
+                        PortNumber = port,
+                        ForeignIP = foreignAddress
+                    });
+                }
+            }
+
+            try
+            {
+                process = Process.GetProcessById(pid);
+            }
+            catch (ArgumentException)
+            {
+                process = null;
+            }
+
+            return ports;
         }
     }
 }

@@ -9,12 +9,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NetFwTypeLib;
+using ProcessConnectionsManager.Block;
+using ProcessConnectionsManager.PacketCapture;
 
 namespace ProcessConnectionsManager
 {
     public partial class MainForm : Form
     {
-        private Pcap PcapReceiver;
+        private AbstractCapturer Capturer;
 
         public MainForm()
         {
@@ -36,7 +38,7 @@ namespace ProcessConnectionsManager
             }
             else
             {
-                if (ProcessNameBox.Text == "")
+                if (string.IsNullOrEmpty(ProcessNameBox.Text))
                 {
                     return;
                 }
@@ -79,23 +81,20 @@ namespace ProcessConnectionsManager
 
         private void FwCheckButton_Click(object sender, EventArgs e)
         {
-            FirewallStatus fwStatus = WinFirewall.IsFirewallEnabled();
-
-            if (fwStatus == FirewallStatus.Enabled)
+            switch (WinFirewall.IsFirewallEnabled())
             {
-                MessageBox.Show("Windows firewall is enabled.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-            }
-            else if (fwStatus == FirewallStatus.PrivateDisabled)
-            {
-                MessageBox.Show("Private networks are disabled in windows firewall. This may not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-            }
-            else if (fwStatus == FirewallStatus.PublicDisabled)
-            {
-                MessageBox.Show("Public networks are disabled in windows firewall. This may not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-            }
-            else
-            {
-                MessageBox.Show("Windows firewall is disabled. This will not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                case FirewallStatus.Enabled:
+                    MessageBox.Show("Windows firewall is enabled.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                    break;
+                case FirewallStatus.PrivateDisabled:
+                    MessageBox.Show("Private networks are disabled in windows firewall. This may not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                    break;
+                case FirewallStatus.PublicDisabled:
+                    MessageBox.Show("Public networks are disabled in windows firewall. This may not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                    break;
+                default:
+                    MessageBox.Show("Windows firewall is disabled. This will not allow you to block connections successfully.", "Windows Firewall Check", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+                    break;
             }
         }
 
@@ -107,10 +106,7 @@ namespace ProcessConnectionsManager
 
         private void PortList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (PcapReceiver != null)
-            {
-                PcapReceiver.StopCapturing();
-            }
+            Capturer?.StopCapturing();
 
             ForeignIPList.Items.Clear();
 
@@ -121,14 +117,7 @@ namespace ProcessConnectionsManager
             }
 
             var selectedItem = PortList.SelectedItems[0];
-            if (selectedItem.SubItems[2].Text == "UDP")
-            {
-                UDPListenButton.Enabled = true;
-            }
-            else
-            {
-                UDPListenButton.Enabled = false;
-            }
+            UDPListenButton.Enabled = selectedItem.SubItems[2].Text == "UDP";
 
             PortTextBox.Text = selectedItem.SubItems[0].Text;
             ForeignIPTextBox.Text = selectedItem.SubItems[1].Text;
@@ -149,13 +138,13 @@ namespace ProcessConnectionsManager
 
         private void BlockButton_Click(object sender, EventArgs e)
         {
-            if (PortTextBox.Text == "" || ProtocolTextBox.Text == "")
+            if (string.IsNullOrEmpty(PortTextBox.Text) || string.IsNullOrEmpty(ProtocolTextBox.Text))
             {
                 MessageBox.Show("Missing selection. Choose a result from the 'Find ports' section.", "Missing selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            if (ForeignIPTextBox.Text == "")
+            if (string.IsNullOrEmpty(ForeignIPTextBox.Text))
             {
                 MessageBox.Show("A foreign IP is required. Use the 'Listen for remote connections' button if the protocol is UDP and choose one of the IP addresses that may appear over time.", "No foreign IP", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -178,8 +167,8 @@ namespace ProcessConnectionsManager
 
         private void UDPListenButton_Click(object sender, EventArgs e)
         {
-            PcapReceiver = new Pcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
-            PcapReceiver.StartCapturing();
+            Capturer = new Pcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
+            Capturer.StartCapturing();
         }
     }
 }
