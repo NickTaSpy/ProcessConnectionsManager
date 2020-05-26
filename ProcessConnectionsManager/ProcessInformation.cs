@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -93,6 +95,24 @@ namespace ProcessConnectionsManager
             }
 
             return ports;
+        }
+
+        public static string GetMainModuleFileName(this Process process)
+        {
+            const string wmiQueryString = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process";
+
+            using var searcher = new ManagementObjectSearcher(wmiQueryString);
+            using var results = searcher.Get();
+
+            var query = from p in new Process[] { process }
+                        join mo in results.Cast<ManagementObject>()
+                        on p.Id equals (int)(uint)mo["ProcessId"]
+                        select new
+                        {
+                            Path = (string)mo["ExecutablePath"]
+                        };
+
+            return query.FirstOrDefault()?.Path ?? "";
         }
     }
 }

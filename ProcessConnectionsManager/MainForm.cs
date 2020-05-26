@@ -55,14 +55,7 @@ namespace ProcessConnectionsManager
 
             if (process != null)
             {
-                try
-                {
-                    ProcessPathTextBox.Text = process.MainModule.FileName;
-                }
-                catch (Exception)
-                {
-                    ProcessPathTextBox.Text = "";
-                }
+                ProcessPathTextBox.Text = process.GetMainModuleFileName();
             }
         }
 
@@ -126,7 +119,7 @@ namespace ProcessConnectionsManager
 
         private void ForeignIPList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ForeignIPList.SelectedItems.Count == 0)
+            if (ForeignIPList.SelectedItems.Count < 1)
             {
                 ForeignIPList.Items.Clear();
                 return;
@@ -167,7 +160,8 @@ namespace ProcessConnectionsManager
 
         private void UDPListenButton_Click(object sender, EventArgs e)
         {
-            Capturer = new Pcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
+            //Capturer = new Pcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
+            Capturer = new Sharppcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
             Capturer.StartCapturing();
         }
     }

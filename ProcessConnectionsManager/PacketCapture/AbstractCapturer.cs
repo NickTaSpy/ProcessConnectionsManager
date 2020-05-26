@@ -4,8 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,52 +14,23 @@ namespace ProcessConnectionsManager.PacketCapture
         protected readonly ListView IPList;
         protected readonly int Port;
 
-        protected Task Receiver;
-        protected CancellationTokenSource CTSource;
-
         protected AbstractCapturer(int port, ListView resultList)
         {
             IPList = resultList;
             Port = port;
         }
 
-        public void StartCapturing()
-        {
-            StopCapturing();
-            CTSource = new CancellationTokenSource();
-            Receiver = Task.Factory.StartNew(Capture, CTSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-        }
+        public abstract void StartCapturing();
 
-        public void StopCapturing()
-        {
-            if (Receiver == null || CTSource?.IsCancellationRequested == true)
-            {
-                return;
-            }
+        public abstract void StopCapturing();
 
-            try
-            {
-                CTSource.Cancel();
-                Receiver.Wait();
-            }
-            finally
-            {
-                CTSource.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Must be implemented using the inherited cancellation token.
-        /// </summary>
-        protected abstract void Capture();
-
-        protected void AddForeignIP(string currentIPText, params string[] addresses)
+        protected void AddForeignIP(IEnumerable<string> ignoredAddresses, params string[] addresses)
         {
             IPList.Invoke(new Action(() =>
             {
                 foreach (var ip in addresses)
                 {
-                    if (!IPList.Items.ContainsKey(ip) && ip != currentIPText)
+                    if (!IPList.Items.ContainsKey(ip) && !ignoredAddresses.Contains(ip))
                     {
                         IPList.Items.Add(ip).Name = ip;
                     }
@@ -69,10 +38,18 @@ namespace ProcessConnectionsManager.PacketCapture
             }));
         }
 
-        protected IPAddress GetCurrentIP()
+        protected void AddForeignIP(params string[] addresses)
         {
-            using var client = new UdpClient("google.com", 21684);
-            return ((IPEndPoint)client.Client.LocalEndPoint).Address;
+            IPList.Invoke(new Action(() =>
+            {
+                foreach (var ip in addresses)
+                {
+                    if (!IPList.Items.ContainsKey(ip))
+                    {
+                        IPList.Items.Add(ip).Name = ip;
+                    }
+                }
+            }));
         }
     }
 }
