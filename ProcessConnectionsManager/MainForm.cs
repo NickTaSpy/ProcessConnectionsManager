@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using NetFwTypeLib;
 using ProcessConnectionsManager.Block;
@@ -100,6 +95,7 @@ namespace ProcessConnectionsManager
         private void PortList_SelectedIndexChanged(object sender, EventArgs e)
         {
             Capturer?.StopCapturing();
+            SetUDPListenerStatusLabel(false);
 
             ForeignIPList.Items.Clear();
 
@@ -160,9 +156,26 @@ namespace ProcessConnectionsManager
 
         private void UDPListenButton_Click(object sender, EventArgs e)
         {
-            //Capturer = new Pcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
+            if (Capturer != null)
+                Capturer.StopCapturing();
+
             Capturer = new Sharppcap(int.Parse(PortList.SelectedItems[0].SubItems[0].Text), ForeignIPList);
             Capturer.StartCapturing();
+            SetUDPListenerStatusLabel(true);
+        }
+
+        private void SetUDPListenerStatusLabel(bool on)
+        {
+            if (on)
+            {
+                UDPListenerStatusLabel.Text = "ON";
+                UDPListenerStatusLabel.ForeColor = Color.Green;
+            }
+            else
+            {
+                UDPListenerStatusLabel.Text = "OFF";
+                UDPListenerStatusLabel.ForeColor = Color.Red;
+            }
         }
     }
 }

@@ -2,6 +2,8 @@
 using SharpPcap;
 using SharpPcap.LibPcap;
 using SharpPcap.Npcap;
+using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,6 +12,9 @@ namespace ProcessConnectionsManager.PacketCapture
 {
     public class Sharppcap : AbstractCapturer
     {
+        private const int StopCaptureTimeoutMs = 1000;
+        private const int ReadTimeoutMilliseconds = 1000;
+
         private readonly List<string> IgnoredAddresses = new List<string>();
 
         public Sharppcap(int port, ListView resultList) : base(port, resultList) { }
@@ -26,7 +31,6 @@ namespace ProcessConnectionsManager.PacketCapture
                 MessageBox.Show("No devices were found on this machine", "Sharppcap", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            const int readTimeoutMilliseconds = 1000;
             string filter = $"udp and port {Port}";
 
             foreach (var device in devices)
@@ -35,20 +39,21 @@ namespace ProcessConnectionsManager.PacketCapture
                 {
                     var nPcap = device as NpcapDevice;
                     IgnoredAddresses.AddRange(nPcap.Addresses.Where(x => x?.Addr?.ipAddress != null).Select(x => x.Addr.ipAddress.ToString()));
-                    nPcap.Open(OpenFlags.DataTransferUdp | OpenFlags.NoCaptureLocal, readTimeoutMilliseconds);
-                    nPcap.Filter = filter;
+                    nPcap.Open(OpenFlags.DataTransferUdp | OpenFlags.NoCaptureLocal, ReadTimeoutMilliseconds);
                 }
                 else if (device is LibPcapLiveDevice)
                 {
                     var livePcapDevice = device as LibPcapLiveDevice;
                     IgnoredAddresses.AddRange(livePcapDevice.Addresses.Where(x => x?.Addr?.ipAddress != null).Select(x => x.Addr.ipAddress.ToString()));
-                    livePcapDevice.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
-                    livePcapDevice.Filter = filter;
+                    livePcapDevice.Open(DeviceMode.Promiscuous, ReadTimeoutMilliseconds);
                 }
                 else
                 {
                     MessageBox.Show($"Unknown device type of {device.GetType()}", "Sharppcap", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                device.Filter = filter;
+                device.StopCaptureTimeout = TimeSpan.FromMilliseconds(StopCaptureTimeoutMs);
 
                 device.OnPacketArrival += OnPacketArrival;
                 device.StartCapture();
@@ -59,9 +64,14 @@ namespace ProcessConnectionsManager.PacketCapture
         {
             foreach (var device in CaptureDeviceList.Instance)
             {
-                device.Close();
-                device.StopCapture();
                 device.OnPacketArrival -= OnPacketArrival;
+
+                try
+                {
+                    device.StopCapture();
+                    device.Close();
+                }
+                catch (PcapException) { }
             }
         }
 

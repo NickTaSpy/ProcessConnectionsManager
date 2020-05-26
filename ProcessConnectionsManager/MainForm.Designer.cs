@@ -57,6 +57,7 @@
             this.ForeignIPList = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ListenerToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.UDPListenerStatusLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -300,9 +301,9 @@
             this.UDPListenButton.Enabled = false;
             this.UDPListenButton.Location = new System.Drawing.Point(6, 19);
             this.UDPListenButton.Name = "UDPListenButton";
-            this.UDPListenButton.Size = new System.Drawing.Size(156, 34);
+            this.UDPListenButton.Size = new System.Drawing.Size(115, 34);
             this.UDPListenButton.TabIndex = 20;
-            this.UDPListenButton.Text = "Listen for remote connections";
+            this.UDPListenButton.Text = "Listen";
             this.ListenerToolTip.SetToolTip(this.UDPListenButton, "When a UDP port is selected from the \'Find Ports\' list you need to press this but" +
         "ton to look for the remote IP Addresses that communicate through this port.");
             this.UDPListenButton.UseVisualStyleBackColor = true;
@@ -312,6 +313,7 @@
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox3.Controls.Add(this.UDPListenerStatusLabel);
             this.groupBox3.Controls.Add(this.ForeignIPList);
             this.groupBox3.Controls.Add(this.UDPListenButton);
             this.groupBox3.Location = new System.Drawing.Point(293, 12);
@@ -350,6 +352,17 @@
             this.ListenerToolTip.InitialDelay = 500;
             this.ListenerToolTip.ReshowDelay = 100;
             // 
+            // UDPListenerStatusLabel
+            // 
+            this.UDPListenerStatusLabel.AccessibleName = "";
+            this.UDPListenerStatusLabel.AutoSize = true;
+            this.UDPListenerStatusLabel.ForeColor = System.Drawing.Color.Red;
+            this.UDPListenerStatusLabel.Location = new System.Drawing.Point(127, 30);
+            this.UDPListenerStatusLabel.Name = "UDPListenerStatusLabel";
+            this.UDPListenerStatusLabel.Size = new System.Drawing.Size(27, 13);
+            this.UDPListenerStatusLabel.TabIndex = 23;
+            this.UDPListenerStatusLabel.Text = "OFF";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -369,6 +382,7 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -403,6 +417,7 @@
         private System.Windows.Forms.ToolTip ListenerToolTip;
         private System.Windows.Forms.ListView ForeignIPList;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.Label UDPListenerStatusLabel;
     }
 }
 
