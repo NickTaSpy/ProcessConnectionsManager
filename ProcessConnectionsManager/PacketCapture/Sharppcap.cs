@@ -12,7 +12,7 @@ namespace ProcessConnectionsManager.PacketCapture
 {
     public class Sharppcap : AbstractCapturer
     {
-        private const int StopCaptureTimeoutMs = 1000;
+        private const int StopCaptureTimeoutMs = 500;
         private const int ReadTimeoutMilliseconds = 1000;
 
         private readonly List<string> IgnoredAddresses = new List<string>();
