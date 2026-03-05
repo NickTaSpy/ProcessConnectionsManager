@@ -1,3 +1,5 @@
+<img width="766" height="482" alt="image" src="https://github.com/user-attachments/assets/a49765b3-0870-4738-8c92-ef150b384934" />
+
 # ProcessConnectionsManager
 Windows Form Application - Allows you to block remote IP addresses that communicate with a process.
 
